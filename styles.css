@@ -1,0 +1,96 @@
+/* General Styles */
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: #9e939356;
+    color: #333;
+}
+
+/* Container Style */
+.container {
+    width: 80%;
+    max-width: 1200px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    text-align: left;
+}
+
+/* Front Picture Style */
+.FrontPicture img {
+    width: 30%;
+    height: auto;
+    margin-top: -5%;
+    margin-bottom: -15%;
+    margin-left: -2%;
+    border-radius: 50%;
+}
+
+/* My Picture Style */
+.MPicture img {
+    width: 200px;
+    height: auto;
+    border-radius: 30%;
+    margin-top: 10%;
+    margin-bottom: -10%;
+}
+
+/* Introduction and Picture Alignment */
+.Intro, .MPicture {
+    display: inline-block;
+    vertical-align: top;
+    width: 45%;
+}
+
+.Intro {
+    text-align: left;
+}
+
+.MPicture {
+    text-align: right;
+}
+
+/* Section Margin Top */
+.Intro, .Academics, .Extra-Curriculars, .Courses, .Skills, .Hobbies, .Contact {
+    margin-top: 20px;
+}
+
+/* Headings Style */
+h1 {
+    margin: 20px 0;
+    color: #000000;
+    font-family: 'Georgia', serif;
+}
+
+/* List Style */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background: #4144472e;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    .Intro, .MPicture {
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+
+    .FrontPicture img {
+        width: 60%;
+    }
+}
