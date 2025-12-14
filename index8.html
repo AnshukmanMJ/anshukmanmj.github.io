@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anshukman M J | AI Engineer | System Ready...</title>
+    <link rel="stylesheet" href="https://unpkg.com/98.css">
+    <style>
+        body {
+            background-color: #008080;
+            background-image:
+                linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            font-family: 'Pixelated MS Sans Serif', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* The Desktop Area */
+        #desktop {
+            position: relative;
+            width: 100%;
+            height: calc(100% - 40px);
+            /* Leave room for taskbar */
+            overflow: hidden;
+        }
+
+        /* --- BACKGROUND LOGO WATERMARK --- */
+        #bg-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            opacity: 0.4;
+            /* Transparency */
+            pointer-events: none;
+            /* CRITICAL: Allows clicking through the image */
+            z-index: 0;
+            /* Behind everything */
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        /* Window Styles */
+        .window {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            background: #c0c0c0;
+            box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px grey, inset 2px 2px #fff;
+            padding: 3px;
+        }
+
+        /* Window Content */
+        .window-body {
+            flex-grow: 1;
+            overflow: auto;
+            margin: 2px;
+            background: #c0c0c0;
+        }
+
+        /* Initial Window Positions */
+        #profile-window {
+            top: 20px;
+            left: 20px;
+            width: 380px;
+            z-index: 10;
+        }
+
+        #skills-window {
+            top: 20px;
+            left: 420px;
+            width: 500px;
+            z-index: 5;
+        }
+
+        #projects-window {
+            top: 350px;
+            left: 50px;
+            width: 550px;
+            z-index: 8;
+        }
+
+        #awards-window {
+            top: 320px;
+            left: 650px;
+            width: 450px;
+            z-index: 4;
+        }
+
+        /* MAXIMIZED STATE CSS */
+        .window.maximized {
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 900 !important;
+            box-shadow: none;
+        }
+
+        /* Profile Styles */
+        .profile-pic-placeholder {
+            width: 100px;
+            height: 100px;
+            background: #000;
+            border: 2px inset #fff;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-pic-placeholder img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        fieldset {
+            border: 2px groove white;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        legend {
+            font-weight: bold;
+        }
+
+        /* Terminal Skills */
+        .terminal {
+            background-color: black;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 10px;
+            height: 250px;
+            overflow-y: auto;
+            border: 2px inset #fff;
+            line-height: 1.4;
+        }
+
+        /* Project Links */
+        .project-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 5px;
+        }
+
+        .project-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .project-item {
+            border: 2px groove #fff;
+            padding: 5px;
+            background: #fff;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .project-item:hover {
+            background: #000080;
+            color: white;
+        }
+
+        .project-title {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .project-desc {
+            font-size: 0.9em;
+            margin: 3px 0;
+        }
+
+        .project-tech {
+            font-size: 0.8em;
+            font-style: italic;
+            color: #444;
+        }
+
+        .project-item:hover .project-tech {
+            color: #ddd;
+        }
+
+        /* Taskbar */
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: #c0c0c0;
+            border-top: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 5px;
+            z-index: 1000;
+            box-sizing: border-box;
+        }
+
+        .start-btn {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 6px;
+            min-width: 80px;
+        }
+
+        .start-btn.active {
+            box-shadow: inset 1px 1px 0px #000, inset -1px -1px 0px #fff;
+            background: #e0e0e0;
+        }
+
+        /* Clock */
+        .taskbar-tray {
+            border: 2px inset #fff;
+            padding: 4px 10px;
+            font-family: monospace;
+            background: #c0c0c0;
+            margin-left: auto;
+            margin-right: 5px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Start Menu */
+        #start-menu {
+            position: fixed;
+            bottom: 40px;
+            left: 2px;
+            width: 200px;
+            background: #c0c0c0;
+            border: 2px outset #fff;
+            display: none;
+            flex-direction: row;
+            z-index: 1001;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .start-sidebar {
+            background: #000080;
+            color: white;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            padding: 5px;
+            font-weight: bold;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
+        .menu-content {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .start-item {
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .start-item:hover {
+            background: #000080;
+            color: white;
+        }
+
+        .divider {
+            border-bottom: 1px solid #808080;
+            border-top: 1px solid #fff;
+            margin: 2px 0;
+        }
+
+        /* Animations */
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .cursor {
+            animation: blink 1s step-end infinite;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="desktop">
+
+        <img id="bg-logo" src="windows_98_logo.png" alt="Windows 98 Logo">
+
+        <div class="window" id="profile-window" onclick="bringToFront(this)">
+            <div class="title-bar">
+                <div class="title-bar-text">User_Profile.exe</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize" onclick="minimizeWindow('profile-window')"></button>
+                    <button aria-label="Maximize" onclick="maximizeWindow('profile-window')"></button>
+                    <button aria-label="Close" onclick="closeWindow('profile-window')"></button>
+                </div>
+            </div>
+            <div class="window-body">
+
+                <h3 style="text-align: center; margin: 0;">Anshukman M J</h3>
+                <p style="text-align: center; margin-top: 5px;">Chennai, IN | +91-6380889875</p>
+                <p style="text-align: center; margin-top: 0; font-size: 0.9em;">mjanshukman@gmail.com</p>
+
+                <fieldset>
+                    <legend>Education</legend>
+                    <p style="margin: 5px 0;"><strong>Shiv Nadar University Chennai</strong><br>
+                        B.Tech Computer Science (IoT)<br>
+                        CGPA: 9.15 (Expected 2028)</p>
+                    <hr>
+                    <p style="margin: 5px 0;"><strong>Bhavans Rajaji Vidhyashram</strong><br>
+                        Class 12: 91.2% | Class 10: 96%</p>
+                </fieldset>
+
+                <div style="text-align: center; margin-top: 10px; padding-bottom: 10px;">
+                    <a href="https://github.com/AnshukmanMJ" target="_blank"><button>GitHub</button></a>
+                    <a href="https://www.linkedin.com/in/anshukmanmj" target="_blank"><button>LinkedIn</button></a>
+                    <a href="https://www.codechef.com/users/codemja_2006" target="_blank"><button>CodeChef</button></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="window" id="skills-window" onclick="bringToFront(this)">
+            <div class="title-bar">
+                <div class="title-bar-text">Command Prompt - Skills & Certs</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize" onclick="minimizeWindow('skills-window')"></button>
+                    <button aria-label="Maximize" onclick="maximizeWindow('skills-window')"></button>
+                    <button aria-label="Close" onclick="closeWindow('skills-window')"></button>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="terminal">
+                    C:\Users\Anshukman> list skills --full<br>
+                    ----------------------------------------<br>
+                    LANGUAGES : Python, JS, C++, Java, C, HTML, CSS<br>
+                    DATABASES : PostgreSQL, MongoDB<br>
+                    FRAMEWORKS: FastAPI, React, Tailwind<br>
+                    LIBRARIES : ScikitLearn, Pandas, Numpy, Matplotlib<br>
+                    CLOUD/DEVOPS: GCS, Git, Bash, GitHub<br>
+                    ML ALGOS : KNN, K-Means, Linear/Logistic Reg, SVM, Random Forests<br>
+                    DESIGN/PM : Agile, Scrum, Figma, Asana<br>
+                    ----------------------------------------<br><br>
+
+                    C:\Users\Anshukman> list certifications --verified<br>
+                    > [PASS] Stanford/DeepLearning.ai: ML Specialization<br>
+                    > [PASS] Google Cloud: GCP Essentials<br>
+                    > [PASS] IBM AI Developer: Professional<br>
+                    > [PASS] Meta FrontEnd Developer<br>
+                    > [PASS] FreeCodeCamp: API Dev (FastAPI)<br>
+                    > [PASS] Microsoft UX Professional<br>
+                    > [PASS] Google Project Management<br>
+                    > [PASS] NPTEL OOPs in Java<br><br>
+                    C:\Users\Anshukman> <span class="cursor">_</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="window" id="projects-window" onclick="bringToFront(this)">
+            <div class="title-bar">
+                <div class="title-bar-text">C:\Projects\Explorer</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize" onclick="minimizeWindow('projects-window')"></button>
+                    <button aria-label="Maximize" onclick="maximizeWindow('projects-window')"></button>
+                    <button aria-label="Close" onclick="closeWindow('projects-window')"></button>
+                </div>
+            </div>
+            <div class="window-body">
+                <p style="margin: 5px;">6 object(s) found:</p>
+                <div class="project-list">
+
+                    <a href="https://finlaticsdigitalmarketing.netlify.app/" target="_blank" class="project-link">
+                        <div class="project-item">
+                            <div class="project-title">1. Finlatics DS Capstone: Ad Campaign</div>
+                            <div class="project-desc">Statistical analysis on marketing data. Visualized trade-offs
+                                between ad geometry and placement strategy.</div>
+                            <div class="project-tech">Stack: Python, Pandas, Seaborn, Stat Modeling</div>
+                        </div>
+                    </a>
+
+                    <a href="https://f1codeacademymlportfolio.netlify.app/" target="_blank" class="project-link">
+                        <div class="project-item">
+                            <div class="project-title">2. F1 Races Analysis (ML Foundations)</div>
+                            <div class="project-desc">Processed multi-season F1 stats. Automated generation of
+                                comparative performance reports (AFR trends).</div>
+                            <div class="project-tech">Stack: Python, Pandas, NumPy, Static Site Gen</div>
+                        </div>
+                    </a>
+
+                    <a href="https://medicalinsuranceanalysis.netlify.app/" target="_blank" class="project-link">
+                        <div class="project-item">
+                            <div class="project-title">3. Medical Insurance Analysis (AIML)</div>
+                            <div class="project-desc">Engineered script for statistical summaries. Correlated Age, BMI,
+                                and Smoking status to charges.</div>
+                            <div class="project-tech">Stack: Python, Pandas, Matplotlib, Data Viz</div>
+                        </div>
+                    </a>
+
+                    <a href="https://cancerdetectorlknn.netlify.app/" target="_blank" class="project-link">
+                        <div class="project-item">
+                            <div class="project-title">4. Cancer Detector: KNN Classifier</div>
+                            <div class="project-desc">Built supervised learning model on WDBC dataset. Optimized 'k'
+                                (1-100) for max precision.</div>
+                            <div class="project-tech">Stack: Python, Scikit-Learn, NumPy</div>
+                        </div>
+                    </a>
+
+                    <a href="https://heisenbergausian.netlify.app/" target="_blank" class="project-link">
+                        <div class="project-item">
+                            <div class="project-title">5. A1A Car Wash Anomaly Detector</div>
+                            <div class="project-desc">Isolation Forests pipeline to detect cash outliers. HTML5
+                                dashboard for revenue vs traffic.</div>
+                            <div class="project-tech">Stack: ML, Python, HTML5/CSS</div>
+                        </div>
+                    </a>
+
+                    <a href="https://beekeepers-ledger-lr.netlify.app/" target="_blank" class="project-link">
+                        <div class="project-item">
+                            <div class="project-title">6. Honey Production Predictor</div>
+                            <div class="project-desc">Linear Regression modeling to predict future agriculture trends.
+                            </div>
+                            <div class="project-tech">Stack: Python, Scikit-Learn</div>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="window" id="awards-window" onclick="bringToFront(this)">
+            <div class="title-bar">
+                <div class="title-bar-text">Awards_Log.txt</div>
+                <div class="title-bar-controls">
+                    <button aria-label="Minimize" onclick="minimizeWindow('awards-window')"></button>
+                    <button aria-label="Maximize" onclick="maximizeWindow('awards-window')"></button>
+                    <button aria-label="Close" onclick="closeWindow('awards-window')"></button>
+                </div>
+            </div>
+            <div class="window-body">
+                <textarea
+                    style="width: 100%; height: 250px; font-family: 'Courier New'; resize: none; border: none; padding: 5px; box-sizing: border-box; line-height: 1.4;"
+                    readonly>
+=== AWARDS & RECOGNITION ===
+* Top 50 teams: Glytch 2025 (Top 10 Software Track)
+* Top 100 teams: Hackathrone 2025
+* Special Mention: Potential Project Showcase 3.0 (2025)
+* Participant: SIH Internal Hackathon 2025
+* 1st Place: Times NIE Ideathon 2024
+* Smt Latchand Memorial Award: Overall Achiever 2024
+* 2nd Place: Technocrats 2023
+* 1st Place: Technocrats 2022
+
+=== VOLUNTEERING & EXPERIENCE ===
+> Finlatics: Data Science Path (Jan 2025 - Mar 2025)
+> National Social Organization Volunteer (2024 - 2025)
+> Student Council: Assistant Head Boy (2023 - 2024)
+                </textarea>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="start-menu">
+        <div class="start-sidebar">AMJ</div>
+        <div class="menu-content">
+            <div class="start-item" onclick="openWindow('profile-window')">
+                <img src="https://win98icons.alexmeub.com/icons/png/users-1.png" width="24">
+                <span>Profile</span>
+            </div>
+            <div class="start-item" onclick="openWindow('projects-window')">
+                <img src="https://win98icons.alexmeub.com/icons/png/directory_open-0.png" width="24">
+                <span>Projects</span>
+            </div>
+            <div class="start-item" onclick="openWindow('skills-window')">
+                <img src="https://win98icons.alexmeub.com/icons/png/console_prompt-0.png" width="24">
+                <span>Skills & Certs</span>
+            </div>
+            <div class="start-item" onclick="openWindow('awards-window')">
+                <img src="https://win98icons.alexmeub.com/icons/png/notepad-0.png" width="24">
+                <span>Awards/Exp</span>
+            </div>
+            <div class="divider"></div>
+            <div class="start-item" onclick="alert('System Shutdown... Goodbye!')">
+                <img src="https://win98icons.alexmeub.com/icons/png/shut_down_cool-0.png" width="24">
+                <span>Shut Down</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="taskbar">
+        <button class="start-btn" id="start-btn" onclick="toggleStartMenu()">
+            <img src="https://win98icons.alexmeub.com/icons/png/windows-0.png" width="18">
+            <b>Start</b>
+        </button>
+        <div class="taskbar-tray" id="clock">
+            12:00 PM
+        </div>
+    </div>
+
+    <script>
+        // --- Window Management Variables ---
+        let maxZIndex = 100;
+
+        // Bring window to front
+        function bringToFront(element) {
+            maxZIndex++;
+            element.style.zIndex = maxZIndex;
+        }
+
+        // CLOSE
+        function closeWindow(id) {
+            const win = document.getElementById(id);
+            win.style.display = 'none';
+        }
+
+        // MINIMIZE
+        function minimizeWindow(id) {
+            const win = document.getElementById(id);
+            win.style.display = 'none';
+        }
+
+        // MAXIMIZE
+        function maximizeWindow(id) {
+            const win = document.getElementById(id);
+            if (win.classList.contains('maximized')) {
+                win.classList.remove('maximized');
+            } else {
+                win.classList.add('maximized');
+                bringToFront(win);
+            }
+        }
+
+        // OPEN / RESTORE
+        function openWindow(id) {
+            const win = document.getElementById(id);
+            if (win.style.display === 'none') {
+                win.style.display = 'flex';
+            }
+            bringToFront(win);
+            toggleStartMenu();
+        }
+
+        // --- Start Menu Logic ---
+        function toggleStartMenu() {
+            const menu = document.getElementById('start-menu');
+            const btn = document.getElementById('start-btn');
+
+            if (menu.style.display === 'flex') {
+                menu.style.display = 'none';
+                btn.classList.remove('active');
+            } else {
+                menu.style.display = 'flex';
+                btn.classList.add('active');
+            }
+        }
+
+        document.addEventListener('click', function (event) {
+            const menu = document.getElementById('start-menu');
+            const btn = document.getElementById('start-btn');
+            if (!menu.contains(event.target) && !btn.contains(event.target)) {
+                menu.style.display = 'none';
+                btn.classList.remove('active');
+            }
+        });
+
+        // --- Clock Logic ---
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const dateString = now.toLocaleDateString([], { month: 'short', day: 'numeric' });
+            document.getElementById('clock').innerHTML = `${dateString} &nbsp; ${timeString}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // --- Dragging Logic ---
+        document.querySelectorAll('.title-bar').forEach(bar => {
+            bar.onmousedown = function (e) {
+                const win = bar.parentElement;
+                if (e.target.tagName === 'BUTTON') return;
+                if (win.classList.contains('maximized')) return;
+
+                bringToFront(win);
+
+                let shiftX = e.clientX - win.getBoundingClientRect().left;
+                let shiftY = e.clientY - win.getBoundingClientRect().top;
+
+                function moveAt(pageX, pageY) {
+                    win.style.left = pageX - shiftX + 'px';
+                    win.style.top = pageY - shiftY + 'px';
+                }
+
+                function onMouseMove(event) {
+                    moveAt(event.pageX, event.pageY);
+                }
+
+                document.addEventListener('mousemove', onMouseMove);
+
+                bar.onmouseup = function () {
+                    document.removeEventListener('mousemove', onMouseMove);
+                    bar.onmouseup = null;
+                };
+            };
+        });
+    </script>
+
+</body>
+
+</html>
